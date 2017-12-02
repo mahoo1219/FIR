@@ -19,6 +19,9 @@ public class ChessBoard extends JPanel {
     boolean isGaming = true;
 
     private Five five;
+    private Chess tempChess;
+    private int oldCol;
+    private int oldRow;
 
     private boolean hasChess(int col, int row) {
         for (int i = 0; i < chessCount; i++) {
@@ -155,6 +158,39 @@ public class ChessBoard extends JPanel {
 
     class MouseMointor extends MouseAdapter {
         @Override
+        public void mousePressed(MouseEvent e) {
+            if (!isGaming) return;
+            int col = (e.getX() - MARGIN + SPAN / 2) / SPAN;
+            int row = (e.getY() - MARGIN + SPAN / 2) / SPAN;
+
+            if (col < 0 || col > COLS || row < 0 || row > ROWS) return;
+            if (hasChess(col, row)) return;
+            tempChess = new Chess(ChessBoard.this, col, row, isBlack ? Color.BLACK : Color.WHITE);
+            tempChess.draw(ChessBoard.this.getGraphics());
+            oldCol = col;
+            oldRow = row;
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            super.mouseDragged(e);
+            if (!isGaming) return;
+            int col = (e.getX() - MARGIN + SPAN / 2) / SPAN;
+            int row = (e.getY() - MARGIN + SPAN / 2) / SPAN;
+
+            if (col < 0 || col > COLS || row < 0 || row > ROWS) return;
+            if (hasChess(col, row)) return;
+            if ((col != oldCol) || (row != oldRow)) {
+                tempChess.setCol(col);
+                tempChess.setRow(row);
+                paintComponent(ChessBoard.this.getGraphics());
+                tempChess.draw(ChessBoard.this.getGraphics());
+                oldCol = col;
+                oldRow = row;
+            }
+        }
+
+        @Override
         public void mouseReleased(MouseEvent e) {
             if (!isGaming) return;
             int col = (e.getX() - MARGIN + SPAN / 2) / SPAN;
@@ -162,8 +198,8 @@ public class ChessBoard extends JPanel {
 
             if (col < 0 || col > COLS || row < 0 || row > ROWS) return;
             if (hasChess(col, row)) return;
-            Chess chess = new Chess(ChessBoard.this, col, row, isBlack ? Color.BLACK : Color.WHITE);
-            chessList[chessCount++] = chess;
+
+            chessList[chessCount++] = tempChess;
             repaint();
             if (isWin(col, row)) {
                 String colorName = isBlack ? "黑棋" : "白棋";

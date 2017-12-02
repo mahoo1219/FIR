@@ -21,6 +21,14 @@ public class Chess {
         return col;
     }
 
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
     public int getRow() {
         return row;
     }
